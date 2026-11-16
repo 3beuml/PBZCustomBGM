@@ -33,6 +33,29 @@ boss  =                          ; 留空 = 沿用低血曲
 
 支持 mp3 / wav / flac / m4a / aac / wma（ogg 和加密格式不支持）。改完不用重启游戏，F7 点"重载音乐配置"或等 5 秒自动生效。
 
+## 游戏内使用（F7 面板）
+
+装好并**完全重启游戏**后按 F7 打开「CustomBGM 音乐箱」：
+
+- **状态行**：当前状态（探索/战斗/低血/决战/死亡）、播放器运行状态、Boss 血量实时
+- **四曲开关**（战斗/低血/决战/死亡）：即时生效，重启后恢复 config.ini 设定
+- **试播**：每曲一键试听，快速检查配曲
+- **音量 ±10 与全局音量**：点「保存音量设置」才持久化，否则重启丢失
+- **低血阈值 ±5**：点「保存阈值」写回 config.ini
+- **打开音乐文件夹 / 重载音乐配置**：改 player.ini 后立即生效（或等 5 秒自动重读）
+
+最快换歌：把自己的歌改名覆盖 `PBZMusic\` 里的 `low / death / combat`（如直接叫 `low.mp3`），不用动任何配置。
+
+## 排障 FAQ
+
+**Q: 按 F7 没反应？** ① `mods.txt` 没加 `CustomBGM : 1`；② 没完全重启游戏（无热重载）；③ `UE4SS.log` 里出现 `unexpected symbol near '<\239>'` = Lua 文件带 BOM，重新保存为 UTF-8 无 BOM；④ UE4SS 不是 PBZ 专用版。
+
+**Q: 面板显示"播放器：未运行"？** 多半是杀软把 `PBZPlayer.exe` 隔离了——去隔离区恢复并加入信任（SHA256 见下文）；若几秒后自动恢复则是看门狗自愈，不用管。
+
+**Q: 改 config.ini 不生效？** mod 配置必须**完全重启游戏**才生效；只有 player.ini（音乐/音量）支持热重载。
+
+**Q: 没声音？** 看 `PBZMusic\player.log`：`media failed` = 格式/文件问题（见格式说明）；`heartbeat lost` = 游戏侧心跳断。支持 mp3/wav/flac/m4a/aac/wma；ogg 与加密下载（ncm/mflac/kgm）不支持。
+
 ## 构建
 
 播放器：`player\make_wpf.bat`（.NET Framework 自带 csc 编译）
@@ -43,6 +66,13 @@ Lua 不用编译，保存时不要带 BOM。
 
 - OGG/Opus 和加密格式（ncm/mflac/kgm）不支持，先转码
 - 手柄偶尔失灵的问题在 0.6.5 已修（输入残留 + 焦点抢夺两个 bug）
+
+## English quick start
+
+1. **Prerequisite** — install [UE4SS for PBZ](https://www.nexusmods.com/phantombladezero/mods/413).
+2. **Install** — download the zip from [Releases](https://github.com/3beuml/PBZCustomBGM/releases), drag `Mods\` and `PBZMusic\` into `...\steamapps\common\PBZ\platform\steam\`, add one line `CustomBGM : 1` to `ue4ss\Mods\mods.txt`, **fully restart the game** (no hot reload).
+3. **Use** — press **F7** in game: per-track toggles, preview, per-track volume (press **Save** to persist), low-HP threshold, open music folder, reload config. Drop songs into `PBZMusic\` (mp3/wav/flac/m4a/aac/wma; ogg & DRM-wrapped downloads unsupported) or set paths/folders in `PBZMusic\player.ini`. Triggers: combat loop (silent by default), low HP 40% (sticky until fight ends), boss duel ≤25%, death once.
+4. **Troubles** — no F7 panel: check the `CustomBGM : 1` line and fully restart; "player: not running": your AV likely quarantined `PBZPlayer.exe` (see below). Logs: `ue4ss\UE4SS.log` + `PBZMusic\player.log`.
 
 ## 许可
 
