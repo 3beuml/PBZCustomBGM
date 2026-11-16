@@ -73,7 +73,7 @@ Lua 不用编译，保存时不要带 BOM。
 
 1. **Prerequisite** — install [UE4SS for PBZ](https://www.nexusmods.com/phantombladezero/mods/413).
 2. **Install** — download the zip from [Releases](https://github.com/3beuml/PBZCustomBGM/releases), drag `Mods\` and `PBZMusic\` into `...\steamapps\common\PBZ\platform\steam\`, add one line `CustomBGM : 1` to `ue4ss\Mods\mods.txt`, **fully restart the game** (no hot reload).
-3. **Use** — press **F7** in game (click the **语言 / Language** button to switch 中文/English anytime): per-track toggles, preview, per-track volume (press **Save** to persist), low-HP threshold, open music folder, reload config. Drop songs into `PBZMusic\` (mp3/wav/flac/m4a/aac/wma; ogg & DRM-wrapped downloads unsupported) or set paths/folders in `PBZMusic\player.ini`. Triggers: combat loop (silent by default), low HP 40% (sticky until fight ends), boss duel ≤25%, death once.
+3. **Use** — press **F7** in game (click the **语言 / Language** button to switch 中文/English anytime): per-track toggles, preview, per-track volume (press **Save** to persist), low-HP threshold, open music folder, reload config. Three royalty-free demo tracks are included (Kevin MacLeod / incompetech.com, CC-BY 4.0) — drop songs into `PBZMusic\` to replace them (mp3/wav/flac/m4a/aac/wma; ogg & DRM-wrapped downloads unsupported) or set paths/folders in `PBZMusic\player.ini`. Triggers: combat loop (silent by default), low HP 40% (sticky until fight ends), boss duel ≤25%, death once.
 4. **Troubles** — no F7 panel: check the `CustomBGM : 1` line and fully restart; "player: not running": your AV likely quarantined `PBZPlayer.exe` (see below). Logs: `ue4ss\UE4SS.log` + `PBZMusic\player.log`.
 
 ## 许可
@@ -97,3 +97,10 @@ PBZCustomBGM-Setup.exe   ee843340a91dc89acae4888f1ca7dda890e6dd5b17e7268caa6a81a
 ```
 
 本 mod 全程不调用 cmd / 脚本宿主，不联网，不捆绑任何歌曲。
+
+**内置演示曲**（可自由商用，换成自己的歌后可删除）：
+Guzheng City / Shenyang / Clenched Teeth — Kevin MacLeod（incompetech.com），
+Creative Commons BY 4.0 授权随包分发。本 mod 不含、不分发任何版权音乐。
+
+**免版权曲源推荐**：Pixabay Music（免费商用无署名）、YouTube 音频库、incompetech.com（CC-BY）、
+OpenGameArt（多为 CC0）。认准 CC0 / CC-BY 标记即可入包。
