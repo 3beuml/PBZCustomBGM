@@ -47,3 +47,21 @@ Lua 不用编译，保存时不要带 BOM。
 ## 许可
 
 MIT。第三方组件：UE4SS（按其自身条款分发）、ModMenu.lua（MIT，mattdavida/ue4ss-ModMenu，带本地改动）。
+
+## 下载
+
+- 正式发布页：https://www.nexusmods.com/phantombladezero/mods/1194
+- 若 Nexus 主文件显示"已被隔离/审核中"，可从本仓库 [Releases](https://github.com/3beuml/PBZCustomBGM/releases) 直接下载同版 zip。
+
+## 杀毒软件误报说明
+
+`PBZPlayer.exe` 是本 mod 的无窗口播放器本体，C# 源码在 `player/PBZPlayerWPF.cs`，用 `player/make_wpf.bat`（.NET Framework 自带 csc）即可编译。个人项目没有代码签名证书，个别杀毒软件或 SmartScreen 可能误报——遇到拦截选"保留/信任"即可。
+
+如需核对，SHA256 如下：
+
+```
+PBZPlayer.exe            fb43a39259adf1e295a34aa9fe9e6cac4d2d8c4ef3b3abc34047e7fe0a391142
+PBZCustomBGM-Setup.exe   ee843340a91dc89acae4888f1ca7dda890e6dd5b17e7268caa6a81ad9085d445
+```
+
+本 mod 全程不调用 cmd / 脚本宿主，不联网，不捆绑任何歌曲。
