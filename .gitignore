@@ -1,0 +1,17 @@
+# 运行时文件（用户机器上产生的，不入库）
+*.log
+state.txt
+heartbeat.txt
+alive.txt
+volume_override.txt
+selftest_ok.txt
+learned_paths.txt
+out/
+
+# 构建产物（走 Releases，不入库）
+*.exe
+*.zip
+
+# 用户实际配置（模板 config.ini/player.ini 入库，个人配置不入库）
+PBZMusic/player.ini
+PBZMusic/README_用户必读.txt
