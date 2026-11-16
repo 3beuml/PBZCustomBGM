@@ -12,6 +12,8 @@ Nexus 发布页：https://www.nexusmods.com/phantombladezero/mods/1194
 - 独立音量 + 总音量，切曲淡入淡出
 - 播放器自带看门狗和焦点防护，卡死自愈、不抢游戏焦点
 
+- 🌐 **F7 面板中英双语**：「语言 Language」按钮即时切换中文/English，点击即写回 config.ini（重启保留）
+
 ## 安装
 
 先装 [UE4SS for Phantom Blade Zero](https://www.nexusmods.com/phantombladezero/mods/5)。
@@ -71,7 +73,7 @@ Lua 不用编译，保存时不要带 BOM。
 
 1. **Prerequisite** — install [UE4SS for PBZ](https://www.nexusmods.com/phantombladezero/mods/413).
 2. **Install** — download the zip from [Releases](https://github.com/3beuml/PBZCustomBGM/releases), drag `Mods\` and `PBZMusic\` into `...\steamapps\common\PBZ\platform\steam\`, add one line `CustomBGM : 1` to `ue4ss\Mods\mods.txt`, **fully restart the game** (no hot reload).
-3. **Use** — press **F7** in game: per-track toggles, preview, per-track volume (press **Save** to persist), low-HP threshold, open music folder, reload config. Drop songs into `PBZMusic\` (mp3/wav/flac/m4a/aac/wma; ogg & DRM-wrapped downloads unsupported) or set paths/folders in `PBZMusic\player.ini`. Triggers: combat loop (silent by default), low HP 40% (sticky until fight ends), boss duel ≤25%, death once.
+3. **Use** — press **F7** in game (click the **语言 / Language** button to switch 中文/English anytime): per-track toggles, preview, per-track volume (press **Save** to persist), low-HP threshold, open music folder, reload config. Drop songs into `PBZMusic\` (mp3/wav/flac/m4a/aac/wma; ogg & DRM-wrapped downloads unsupported) or set paths/folders in `PBZMusic\player.ini`. Triggers: combat loop (silent by default), low HP 40% (sticky until fight ends), boss duel ≤25%, death once.
 4. **Troubles** — no F7 panel: check the `CustomBGM : 1` line and fully restart; "player: not running": your AV likely quarantined `PBZPlayer.exe` (see below). Logs: `ue4ss\UE4SS.log` + `PBZMusic\player.log`.
 
 ## 许可
