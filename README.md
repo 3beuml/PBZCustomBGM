@@ -29,9 +29,7 @@ Prerequisite: [UE4SS for Phantom Blade Zero](https://www.nexusmods.com/phantombl
 2. Open `ue4ss\Mods\mods.txt` in Notepad and add one line: `CustomBGM : 1`
 3. Fully restart the game (no hot reload), then press **F7** — "Player: running" means it works
 
-**One-click (optional)** — the `PBZCustomBGM-vX.Y.Z-with-setup.zip` contains `PBZCustomBGM-Setup.exe`; it locates your Steam library, writes the same files, and can uninstall cleanly (`PBZCustomBGM-Setup.exe -uninstall`, your songs are kept).
-
-Everything the mod installs is a new file; uninstalling means deleting `ue4ss\Mods\CustomBGM\` and `PBZMusic\` plus that one line in `mods.txt`.
+**One-click (optional)** — removed. Manual install is a 3-step drag-and-drop and needs no scripts or installer. Uninstalling = delete the two folders plus that one line in `mods.txt`.
 
 ## Your music
 
@@ -77,7 +75,6 @@ Three royalty-free demo tracks ship in `PBZMusic\` (see [Demo music](#demo-music
 
 ```
 PBZPlayer.exe            fb43a39259adf1e295a34aa9fe9e6cac4d2d8c4ef3b3abc34047e7fe0a391142
-PBZCustomBGM-Setup.exe   ee843340a91dc89acae4888f1ca7dda890e6dd5b17e7268caa6a81ad9085d445
 ```
 
 ## Demo music & licensing
@@ -89,7 +86,6 @@ More royalty-free sources: [Pixabay Music](https://pixabay.com/music/) (no attri
 ## Build
 
 - Player: `player\make_wpf.bat` — compiles `PBZPlayerWPF.cs` with the .NET Framework built-in `csc.exe`, no external dependencies
-- Setup: `csc -out:PBZCustomBGM-Setup.exe installer\Setup.cs`
 - Lua needs no build; save `.lua` files **without a UTF-8 BOM** (UE4SS refuses to load BOM files)
 
 ## License
