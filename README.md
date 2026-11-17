@@ -4,11 +4,9 @@
 
 **Custom BGM triggers for Phantom Blade Zero (UE4SS).** Your music plays automatically when combat starts, when your HP drops low, when a boss duel begins, and on death. The in-game F7 panel handles preview, volume, thresholds and a 中文/English language switch.
 
-No bundled music · no cmd windows · no network calls · uninstall = delete two folders
+No bundled music. No cmd windows. No network calls. Uninstall = delete two folders.
 
-[![Nexus Mods](https://img.shields.io/badge/Nexus-phantombladezero-orange)](https://www.nexusmods.com/phantombladezero/mods/1194) [![Release](https://img.shields.io/github/v/tag/3beuml/PBZCustomBGM?label=release)](https://github.com/3beuml/PBZCustomBGM/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-
----
+Nexus page: https://www.nexusmods.com/phantombladezero/mods/1194 — Downloads: https://github.com/3beuml/PBZCustomBGM/releases — License: MIT
 
 ## Features
 
@@ -23,13 +21,11 @@ No bundled music · no cmd windows · no network calls · uninstall = delete two
 
 Prerequisite: [UE4SS for Phantom Blade Zero](https://www.nexusmods.com/phantombladezero/mods/413) — you should see `dwmapi.dll` and a `ue4ss\` folder under `...\steamapps\common\PBZ\platform\steam\`.
 
-**Manual (recommended)**
-
 1. Drag the `Mods\` and `PBZMusic\` folders from the zip into `...\steamapps\common\PBZ\platform\steam\`
 2. Open `ue4ss\Mods\mods.txt` in Notepad and add one line: `CustomBGM : 1`
 3. Fully restart the game (no hot reload), then press **F7** — "Player: running" means it works
 
-**One-click (optional)** — removed. Manual install is a 3-step drag-and-drop and needs no scripts or installer. Uninstalling = delete the two folders plus that one line in `mods.txt`.
+Everything the mod installs is a new file. Uninstalling means deleting `ue4ss\Mods\CustomBGM\` and `PBZMusic\` plus that one line in `mods.txt`.
 
 ## Your music
 
@@ -91,5 +87,3 @@ More royalty-free sources: [Pixabay Music](https://pixabay.com/music/) (no attri
 ## License
 
 MIT — see [LICENSE](LICENSE). Vendored `ModMenu.lua` is MIT (mattdavida/ue4ss-ModMenu, local changes). UE4SS itself is distributed by its own project under its own terms and is not bundled here. Demo tracks: Kevin MacLeod, CC BY 4.0.
-
-Nexus page: https://www.nexusmods.com/phantombladezero/mods/1194
