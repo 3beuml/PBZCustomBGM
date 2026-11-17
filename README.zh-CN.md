@@ -27,7 +27,7 @@ Nexus 发布页：https://www.nexusmods.com/phantombladezero/mods/1194 · 下载
 2. 记事本打开 `ue4ss\Mods\mods.txt`，加一行：`CustomBGM : 1`
 3. **完全重启游戏**（无热重载），按 **F7** —— 面板显示"播放器：运行中"即成功
 
-**一键安装（可选）**：Release 里的 `PBZCustomBGM-vX.Y.Z-with-setup.zip` 内含 `PBZCustomBGM-Setup.exe`，自动定位 Steam 库、写入同样文件；卸载用 `PBZCustomBGM-Setup.exe -uninstall` 或双击 `uninstall.bat`，你的歌会保留（`PBZMusic.by-uninstaller`）。
+**一键安装（可选）**：已移除——手动安装只需 3 步拖拽，无需脚本或安装器。卸载：删除两个文件夹 + 删掉 mods.txt 那一行，你的歌自己备份。
 
 ## 换歌
 
@@ -73,7 +73,6 @@ Nexus 发布页：https://www.nexusmods.com/phantombladezero/mods/1194 · 下载
 
 ```
 PBZPlayer.exe            fb43a39259adf1e295a34aa9fe9e6cac4d2d8c4ef3b3abc34047e7fe0a391142
-PBZCustomBGM-Setup.exe   ee843340a91dc89acae4888f1ca7dda890e6dd5b17e7268caa6a81ad9085d445
 ```
 
 ## 演示曲与许可
@@ -85,7 +84,6 @@ PBZCustomBGM-Setup.exe   ee843340a91dc89acae4888f1ca7dda890e6dd5b17e7268caa6a81a
 ## 构建
 
 - 播放器：`player\make_wpf.bat` —— 用 .NET Framework 自带 `csc.exe` 编译 `PBZPlayerWPF.cs`，无外部依赖
-- 安装器：`csc -out:PBZCustomBGM-Setup.exe installer\Setup.cs`
 - Lua 无需编译；保存 `.lua` 文件**不得带 UTF-8 BOM**（UE4SS 拒载 BOM 文件）
 
 ## 许可
