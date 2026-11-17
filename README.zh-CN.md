@@ -6,8 +6,6 @@
 
 Nexus 发布页：https://www.nexusmods.com/phantombladezero/mods/1194 · 下载见 [Releases](https://github.com/3beuml/PBZCustomBGM/releases)
 
----
-
 ## 功能
 
 - **四时机触发**：进战斗循环（默认关）/ 低血 40%（粘滞到战斗结束）/ Boss 血量 ≤25% 决战（锁存到 Boss 死/脱战）/ 死亡播一次
@@ -21,13 +19,9 @@ Nexus 发布页：https://www.nexusmods.com/phantombladezero/mods/1194 · 下载
 
 前置：[UE4SS for Phantom Blade Zero](https://www.nexusmods.com/phantombladezero/mods/413)（装好后游戏目录 `platform\steam\` 下应有 `dwmapi.dll` 和 `ue4ss\`）。
 
-**手动安装（推荐）**
-
 1. 把 zip 里的 `Mods\` 和 `PBZMusic\` 两个文件夹拖进 `...\steamapps\common\PBZ\platform\steam\`
 2. 记事本打开 `ue4ss\Mods\mods.txt`，加一行：`CustomBGM : 1`
 3. **完全重启游戏**（无热重载），按 **F7** —— 面板显示"播放器：运行中"即成功
-
-**一键安装（可选）**：已移除——手动安装只需 3 步拖拽，无需脚本或安装器。卸载：删除两个文件夹 + 删掉 mods.txt 那一行，你的歌自己备份。
 
 ## 换歌
 
