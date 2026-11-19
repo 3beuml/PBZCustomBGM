@@ -8,6 +8,9 @@
 // v0.6.2（11-04 深夜）：
 //   - alive.txt 改写 unix epoch 秒：原先写 .NET Ticks（纪元公元1年），Lua os.time() 相减恒为负，
 //     playerAlive() 永远判活 → 播放器死了永不重建、F7 谎报"运行中"（22:59 会话实证）
+// v0.6.7（11-18）：
+//   - 支持 state.txt 的 reload=1 行：重读 player.ini（此前"重载音乐配置"按钮只刷 Lua 侧显示，
+//     播放器启动后从不重读 ini，换歌必须重启进程——11-18 白天班实锤修复）
 // 支持：mp3 / wav / wma / m4a / aac / flac（ogg 不支持）
 // 新增（相对 v0.5）：
 //   - 每类曲目独立音量（[volumes] combat/low/death，0~100）+ 全局音量（global，可被菜单实时改）
@@ -55,6 +58,7 @@ namespace PBZCustomBGM
         static string lastState;
         static string lastPreview;
         static string lastOpen;             // 上一次处理的 open= 目标（null=无）
+        static bool lastReload;             // reload=1 行的上升沿检测（true→false 之间只触发一次重读）
         static bool loopMode, onceMode, previewMode;
         static string currentLoopFile;
 
@@ -128,7 +132,7 @@ namespace PBZCustomBGM
             // 标准 WPF 上下文：没有 Application 时 MediaElement 音频管线会静默失效（v0.2 教训）
             var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
             LoadIni();
-            Log("started (MediaElement v0.6.5+focus-guard), baseDir=" + baseDir);
+            Log("started (MediaElement v0.6.7+focus-guard), baseDir=" + baseDir);
 
             var window = new Window
             {
@@ -267,8 +271,16 @@ namespace PBZCustomBGM
             {
                 FadeStep();
 
-                string state, preview, openPath;
-                ParseStateFile(out state, out preview, out openPath);
+                string state, preview, openPath; bool reload;
+                ParseStateFile(out state, out preview, out openPath, out reload);
+                // reload=1（F7"重载音乐配置"）：上升沿触发一次 ini 重读，
+                // 新曲目路径对下一次状态切换生效（不打断正在播的曲子）
+                if (reload && !lastReload)
+                {
+                    Log("reload: re-reading player.ini");
+                    LoadIni();
+                }
+                lastReload = reload;
                 if (!IsHeartbeatFresh(5.0) || state == null)
                 {
                     if (lastState != null && media != null && media.Source != null)
@@ -454,9 +466,9 @@ namespace PBZCustomBGM
             catch { return false; }
         }
 
-        static void ParseStateFile(out string state, out string preview, out string openPath)
+        static void ParseStateFile(out string state, out string preview, out string openPath, out bool reload)
         {
-            state = null; preview = null; openPath = null;
+            state = null; preview = null; openPath = null; reload = false;
             try
             {
                 if (!File.Exists(baseDir + StateFile)) return;
@@ -480,6 +492,10 @@ namespace PBZCustomBGM
                             ApplyMediaVolume();
                             Log("global volume -> " + d + "%");
                         }
+                    }
+                    else if (k == "reload")
+                    {
+                        reload = (v == "1");
                     }
                 }
             }

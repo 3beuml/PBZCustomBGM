@@ -40,7 +40,103 @@ local opt = {
     deathHold  = CFG.num(cfg.thresholds and cfg.thresholds.deathholdseconds, 10, 0, 120),
     pollMs     = CFG.num(cfg.thresholds and cfg.thresholds.pollintervalms, 200, 50, 2000),
     debug      = CFG.bool(cfg.debug and cfg.debug.statelog, false),
+    lang       = (cfg.display and cfg.display.lang == 'en') and 'en' or 'zh',
 }
+
+--------------------------------------------------
+-- 界面文案（zh/en 双语；F7「语言」按钮即时切换并写回 config.ini [Display] Lang）
+-- 范围：面板可见文案全部双语；UE4SS.log 日志保持中文（排障口径统一，不受语言影响）
+--------------------------------------------------
+local STR = {
+    zh = {
+        panel_title   = 'CustomBGM 音乐箱',
+        st_explore    = '探索（默认）', st_combat = '战斗', st_low = '血量低',
+        st_death      = '死亡', st_boss = 'BOSS决战', st_stop = '已停用',
+        lb_status     = '当前状态：', lb_hp_fmt = '生命：%.0f / %.0f', hp_dash = '生命：-',
+        src_ok        = 'MusicSubsystem：✓，战斗=%s，特殊敌=%s',
+        src_na        = 'MusicSubsystem：未发现（游戏加载中）',
+        player_ok     = '播放器：运行中', player_na = '播放器：未运行（将自动拉起）',
+        files_fmt     = '音乐文件 战斗[%s] 低血[%s] 死亡[%s] 决战[%s]',
+        lb_now        = '正在播放：', now_none = '（无）', preview_tag = '（试播）',
+        boss_duel     = 'Boss：★决战中 血 %.0f / %.0f',
+        boss_fight    = 'Boss：交战中 血 %.0f / %.0f（≤%d%%触发）',
+        boss_na       = 'Boss：未发现（交战特殊敌人后方能读血）',
+        lowpct_fmt    = '低血阈值：%d%%（±5 可调，保存后重启保留）',
+        vols_fmt      = '音量：战斗%d%% 低血%d%% 死亡%d%% 决战%d%% | 总音量 %d%%',
+        lb_tip        = '提示：', lb_warn = '注意：',
+        master_on     = '总开关：开（点击关闭）', master_off = '总开关：关（点击开启）',
+        combat_on     = '战斗曲：开', combat_off = '战斗曲：关',
+        low_on        = '低血曲：开', low_off = '低血曲：关',
+        death_on      = '死亡曲：开', death_off = '死亡曲：关',
+        sticky_on     = '低血粘滞：开', sticky_off = '低血粘滞：关',
+        boss_on       = '决战曲：开', boss_off = '决战曲：关',
+        btn_lang      = '语言：中文（点击切换 English）',
+        pv            = '试播：%s', pv_combat = '战斗曲', pv_low = '低血曲',
+        pv_death      = '死亡曲', pv_boss = '决战曲',
+        pv_ok         = '已请求试播：%s',
+        pv_fail       = '试播失败：找不到 %s',
+        pv_fail_unset = '试播失败：未配置 %s',
+        vol_down      = '总音量 −10', vol_up = '总音量 +10', vol_save = '保存音量设置',
+        pct_down      = '低血阈值 −5', pct_up = '低血阈值 +5', pct_save = '保存阈值',
+        fixinput      = '修复输入模式', stopall = '全部停止',
+        open_media    = '打开音乐文件夹', reload_ini = '重载音乐配置', close = '关闭菜单',
+        open_req      = '已请求打开音乐文件夹（资源管理器在游戏后面，切出去即见）',
+        pct_missing   = '保存阈值失败：找不到 config.ini',
+        pct_noline    = '保存阈值失败：config.ini 里没有 LowHealthPercent 行',
+        pct_saved     = '已保存低血阈值 %d%%（重启后生效于此值）',
+        pct_ro        = '保存阈值失败：config.ini 不可写',
+        lang_saved    = '界面语言已切换：%s（已保存，重启后保留）',
+        dash          = '-',
+        vols_dash     = '音量：-', lowpct_dash = '低血阈值：-',
+    },
+    en = {
+        panel_title   = 'CustomBGM Music Box',
+        st_explore    = 'Explore (default)', st_combat = 'Combat', st_low = 'Low HP',
+        st_death      = 'Death', st_boss = 'BOSS DUEL', st_stop = 'Disabled',
+        lb_status     = 'State: ', lb_hp_fmt = 'HP: %.0f / %.0f', hp_dash = 'HP: -',
+        src_ok        = 'MusicSubsystem: OK, battle=%s, special=%s',
+        src_na        = 'MusicSubsystem: not found (game loading)',
+        player_ok     = 'Player: running', player_na = 'Player: not running (auto-restart)',
+        files_fmt     = 'Files combat[%s] low[%s] death[%s] boss[%s]',
+        lb_now        = 'Now playing: ', now_none = '(none)', preview_tag = ' (preview)',
+        boss_duel     = 'Boss: ★DUEL hp %.0f / %.0f',
+        boss_fight    = 'Boss: engaged hp %.0f / %.0f (triggers ≤%d%%)',
+        boss_na       = 'Boss: not found (readable while special enemy engaged)',
+        lowpct_fmt    = 'Low-HP threshold: %d%% (±5 adjustable, Save keeps it)',
+        vols_fmt      = 'Vol: combat %d%% low %d%% death %d%% boss %d%% | master %d%%',
+        lb_tip        = 'Tip: ', lb_warn = 'Warning: ',
+        master_on     = 'Master: ON (click to stop)', master_off = 'Master: OFF (click to start)',
+        combat_on     = 'Combat track: ON', combat_off = 'Combat track: OFF',
+        low_on        = 'Low-HP track: ON', low_off = 'Low-HP track: OFF',
+        death_on      = 'Death track: ON', death_off = 'Death track: OFF',
+        sticky_on     = 'Low-HP sticky: ON', sticky_off = 'Low-HP sticky: OFF',
+        boss_on       = 'Duel track: ON', boss_off = 'Duel track: OFF',
+        btn_lang      = 'Language: English (click for 中文)',
+        pv            = 'Preview: %s', pv_combat = 'Combat', pv_low = 'Low-HP',
+        pv_death      = 'Death', pv_boss = 'Duel',
+        pv_ok         = 'Preview requested: %s',
+        pv_fail       = 'Preview failed: file not found (%s)',
+        pv_fail_unset = 'Preview failed: %s not configured',
+        vol_down      = 'Master vol −10', vol_up = 'Master vol +10', vol_save = 'Save volume',
+        pct_down      = 'Low-HP −5', pct_up = 'Low-HP +5', pct_save = 'Save threshold',
+        fixinput      = 'Fix input mode', stopall = 'Stop all',
+        open_media    = 'Open music folder', reload_ini = 'Reload music config', close = 'Close menu',
+        open_req      = 'Music folder opening (Explorer opens behind the game window)',
+        pct_missing   = 'Save failed: config.ini not found',
+        pct_noline    = 'Save failed: LowHealthPercent line missing',
+        pct_saved     = 'Low-HP threshold saved: %d%% (kept after restart)',
+        pct_ro        = 'Save failed: config.ini not writable',
+        lang_saved    = 'Language switched: %s (saved, kept after restart)',
+        dash          = '-',
+        vols_dash     = 'Vol: -', lowpct_dash = 'Low-HP threshold: -',
+    },
+}
+local function L(k, ...)
+    local t = STR[opt.lang] or STR.zh
+    local s = t[k] or STR.zh[k] or k
+    if select('#', ...) > 0 then return string.format(s, ...) end
+    return s
+end
 
 --------------------------------------------------
 -- 路径：Scripts -> CustomBGM -> Mods -> ue4ss -> platform\steam
@@ -63,12 +159,12 @@ local function refreshMediaIni()
 end
 refreshMediaIni()
 
-local files = { combat = 'combat.wav', low = 'low.wav', death = 'death.wav', boss = nil }
+local files = { combat = 'combat.mp3', low = 'low.mp3', death = 'death.mp3', boss = nil }
 local function syncFilesFromIni()
     local f = mediaIni.files or mediaIni
-    files.combat = f.combat or 'combat.wav'
-    files.low    = f.low    or 'low.wav'
-    files.death  = f.death  or 'death.wav'
+    files.combat = f.combat or 'combat.mp3'
+    files.low    = f.low    or 'low.mp3'
+    files.death  = f.death  or 'death.mp3'
     files.boss   = f.boss   -- 空/未配置 = 决战曲沿用低血曲（mediaFile 内回落）
 end
 syncFilesFromIni()
@@ -354,6 +450,14 @@ local function pushState(s)
     if os.clock() < deathHoldUntil then return end
     if os.clock() < openHoldUntil then return end
     local content = 'state=' .. s .. '\n'
+    -- 夜班 A2 保险：连续两次死亡间 state 行从未离开 death（快速复活后再死）时，
+    -- 播放器按行内容去重不会把新死亡当"新事件"重播 → 先写一拍 stop，
+    -- 下一拍再写 death 形成变化沿，死亡曲才能重起。
+    -- （放在 pendingVol/pendingReload 之前：stop 拍不消费待写项，留给下一拍）
+    if s == 'death' and lastWritten == content then
+        writeIpc('state=stop\n')
+        return
+    end
     if pendingVol then
         content = content .. 'volume=' .. pendingVol .. '\n'
         pendingVol = nil
@@ -400,22 +504,53 @@ end
 local function saveLowPct()
     local path = MODROOT .. 'config.ini'
     local f = io.open(path, 'r')
-    if not f then flashMsg('保存阈值失败：找不到 config.ini') return end
+    if not f then flashMsg(L('pct_missing')) return end
     local body = f:read('*a')
     f:close()
     local newBody = body:gsub('([Ll]ow[Hh]ealth[Pp]ercent%s*=%s*)%-?%d+', '%1' .. tostring(opt.lowPct))
     if newBody == body then
-        flashMsg('保存阈值失败：config.ini 里没有 LowHealthPercent 行')
+        flashMsg(L('pct_noline'))
         return
     end
     local w = io.open(path, 'w')
     if w then
         w:write(newBody)
         w:close()
-        flashMsg('已保存低血阈值 ' .. opt.lowPct .. '%（重启后生效于此值）')
+        flashMsg(L('pct_saved', opt.lowPct))
     else
-        flashMsg('保存阈值失败：config.ini 不可写')
+        flashMsg(L('pct_ro'))
     end
+end
+
+-- 面板语言：F7「语言」按钮即时切换 + 写回 config.ini [Display] Lang 持久化（v0.6.6）
+local function saveLang()
+    local path = MODROOT .. 'config.ini'
+    local f = io.open(path, 'r')
+    if not f then
+        -- config.ini 缺失（不正常，但兜底）：直接重建最小 [Display] 段
+        local w = io.open(path, 'w')
+        if w then w:write('[Display]\nLang = ' .. opt.lang .. '\n'); w:close() end
+        return
+    end
+    local body = f:read('*a')
+    f:close()
+    local newBody = body:gsub('([Ll]ang%s*=%s*)%w+', '%1' .. opt.lang)
+    if newBody == body then
+        newBody = body .. '\n[Display]\nLang = ' .. opt.lang .. '\n'
+    end
+    local w = io.open(path, 'w')
+    if w then
+        w:write(newBody)
+        w:close()
+    end
+end
+
+local function toggleLang()
+    opt.lang = (opt.lang == 'zh') and 'en' or 'zh'
+    saveLang()
+    -- 面板标题在 Register 时固定，运行期切换下次重启后标题跟随
+    flashMsg(L('lang_saved', opt.lang == 'zh' and '中文' or 'English'))
+    log('界面语言 -> ' .. opt.lang .. '（已写回 config.ini）')
 end
 
 local launchCooldown = 0
@@ -538,6 +673,7 @@ local function coreTick()
         if hp <= hmin then
             latched.dead = true
             latched.low = false
+            deathHoldUntil = 0 -- 新死亡优先：清掉上一轮复活留下的延播保护窗（夜班 A2 保险）
         elseif latched.dead and hp > hmin then
             latched.dead = false -- 复活/读档复位
             deathHoldUntil = os.clock() + opt.deathHold
@@ -618,69 +754,87 @@ end
 function updateMenu()
     if not ui or not ui.IsOpen or not ui.IsOpen() then return end
     local names = {
-        explore = '探索（默认）', combat = '战斗', low = '血量低',
-        death = '死亡', boss = 'BOSS决战', stop = '已停用', appear = '探索（默认）',
+        explore = L('st_explore'), combat = L('st_combat'), low = L('st_low'),
+        death = L('st_death'), boss = L('st_boss'), stop = L('st_stop'), appear = L('st_explore'),
     }
     local files = filesStatus()
     local mark = function(on) return on and '✓' or '×' end
-    ui.SetLabel('custombgm', 'status', '当前状态：' .. (names[view.state] or view.state))
-    ui.SetLabel('custombgm', 'hp', view.hpReady and string.format('生命：%.0f / %.0f', view.hp, view.hmax) or '生命：-')
+    ui.SetLabel('custombgm', 'status', L('lb_status') .. (names[view.state] or view.state))
+    ui.SetLabel('custombgm', 'hp', view.hpReady and L('lb_hp_fmt', view.hp, view.hmax) or L('hp_dash'))
     ui.SetLabel('custombgm', 'src', shard.msReady and
-        string.format('MusicSubsystem：✓，战斗=%s，特殊敌=%s',
-            tostring(view.battle), tostring(view.special)) or 'MusicSubsystem：未发现（游戏加载中）')
+        L('src_ok', tostring(view.battle), tostring(view.special)) or L('src_na'))
     view.playerAlive = playerAlive()
-    ui.SetLabel('custombgm', 'player', view.playerAlive and '播放器：运行中' or '播放器：未运行（将自动拉起）')
-    ui.SetLabel('custombgm', 'files', string.format('音乐文件 战斗[%s] 低血[%s] 死亡[%s] 决战[%s]',
+    ui.SetLabel('custombgm', 'player', view.playerAlive and L('player_ok') or L('player_na'))
+    ui.SetLabel('custombgm', 'files', L('files_fmt',
         mark(files.combat), mark(files.low), mark(files.death), mark(files.boss)))
     -- 正在播放
-    local nowText = '（无）'
+    local nowText = L('now_none')
     if lastPreviewPath then
-        nowText = (lastPreviewPath:match('[^\\/]+$') or lastPreviewPath) .. '（试播）'
+        nowText = (lastPreviewPath:match('[^\\/]+$') or lastPreviewPath) .. L('preview_tag')
     elseif view.state == 'boss' or view.state == 'combat' or view.state == 'low' or view.state == 'death' then
         local p = mediaFile(view.state)
         if p then nowText = (p:match('[^\\/]+$') or p) end
     end
-    ui.SetLabel('custombgm', 'now', '正在播放：' .. nowText)
+    ui.SetLabel('custombgm', 'now', L('lb_now') .. nowText)
     -- Boss 状态行（决战锁存/交战中血量/未发现）
     local bossText
     if latched.boss and view.bmax then
-        bossText = string.format('Boss：★决战中 血 %.0f / %.0f', view.bhp or 0, view.bmax)
+        bossText = L('boss_duel', view.bhp or 0, view.bmax)
     elseif view.bhp and view.bmax then
-        bossText = string.format('Boss：交战中 血 %.0f / %.0f（≤%d%%触发）', view.bhp, view.bmax, opt.bossPct)
+        bossText = L('boss_fight', view.bhp, view.bmax, opt.bossPct)
     else
-        bossText = 'Boss：未发现（交战特殊敌人后方能读血）'
+        bossText = L('boss_na')
     end
     ui.SetLabel('custombgm', 'bossline', bossText)
-    ui.SetLabel('custombgm', 'lowpct', string.format('低血阈值：%d%%（±5 可调，保存后重启保留）', opt.lowPct))
+    ui.SetLabel('custombgm', 'lowpct', L('lowpct_fmt', opt.lowPct))
     -- 音量显示（每类来自 player.ini [volumes]，总音量为菜单实时值）
     local vols = mediaIni.volumes or {}
-    ui.SetLabel('custombgm', 'vols', string.format('音量：战斗%d%% 低血%d%% 死亡%d%% 决战%d%% | 总音量 %d%%',
+    ui.SetLabel('custombgm', 'vols', L('vols_fmt',
         tonumber(vols.combat) or 80, tonumber(vols.low) or 90,
         tonumber(vols.death) or 100, tonumber(vols.boss) or tonumber(vols.low) or 90, view.volGlobal))
     if os.clock() < msgUntil and view.msg then
-        ui.SetLabel('custombgm', 'err', '提示：' .. view.msg)
+        ui.SetLabel('custombgm', 'err', L('lb_tip') .. view.msg)
     elseif view.err then
-        ui.SetLabel('custombgm', 'err', '注意：' .. tostring(view.err))
+        ui.SetLabel('custombgm', 'err', L('lb_warn') .. tostring(view.err))
     else
         ui.SetLabel('custombgm', 'err', ' ')
     end
-    ui.SetButtonLabel('custombgm', 'master', sw.master and '总开关：开（点击关闭）' or '总开关：关（点击开启）')
-    ui.SetButtonLabel('custombgm', 'combat', sw.combat and '战斗曲：开' or '战斗曲：关')
-    ui.SetButtonLabel('custombgm', 'low', sw.low and '低血曲：开' or '低血曲：关')
-    ui.SetButtonLabel('custombgm', 'death', sw.death and '死亡曲：开' or '死亡曲：关')
-    ui.SetButtonLabel('custombgm', 'lowsticky', sw.lowSticky and '低血粘滞：开' or '低血粘滞：关')
-    ui.SetButtonLabel('custombgm', 'boss', sw.boss and '决战曲：开' or '决战曲：关')
+    ui.SetButtonLabel('custombgm', 'master', sw.master and L('master_on') or L('master_off'))
+    ui.SetButtonLabel('custombgm', 'combat', sw.combat and L('combat_on') or L('combat_off'))
+    ui.SetButtonLabel('custombgm', 'low', sw.low and L('low_on') or L('low_off'))
+    ui.SetButtonLabel('custombgm', 'death', sw.death and L('death_on') or L('death_off'))
+    ui.SetButtonLabel('custombgm', 'lowsticky', sw.lowSticky and L('sticky_on') or L('sticky_off'))
+    ui.SetButtonLabel('custombgm', 'boss', sw.boss and L('boss_on') or L('boss_off'))
+    -- 其余按钮文案随语言即时刷新（语言切换不用重启）
+    ui.SetButtonLabel('custombgm', 'pv_combat', L('pv', L('pv_combat')))
+    ui.SetButtonLabel('custombgm', 'pv_low',    L('pv', L('pv_low')))
+    ui.SetButtonLabel('custombgm', 'pv_death',  L('pv', L('pv_death')))
+    ui.SetButtonLabel('custombgm', 'pv_boss',   L('pv', L('pv_boss')))
+    ui.SetButtonLabel('custombgm', 'vol_down', L('vol_down'))
+    ui.SetButtonLabel('custombgm', 'vol_up',   L('vol_up'))
+    ui.SetButtonLabel('custombgm', 'vol_save', L('vol_save'))
+    ui.SetButtonLabel('custombgm', 'pct_down', L('pct_down'))
+    ui.SetButtonLabel('custombgm', 'pct_up',   L('pct_up'))
+    ui.SetButtonLabel('custombgm', 'pct_save', L('pct_save'))
+    ui.SetButtonLabel('custombgm', 'fixinput', L('fixinput'))
+    ui.SetButtonLabel('custombgm', 'stopall',  L('stopall'))
+    ui.SetButtonLabel('custombgm', 'open_media', L('open_media'))
+    ui.SetButtonLabel('custombgm', 'reload_ini', L('reload_ini'))
+    ui.SetButtonLabel('custombgm', 'close',    L('close'))
+    ui.SetButtonLabel('custombgm', 'lang',     L('btn_lang'))
 end
 
 local function previewFile(key)
     local p = mediaFile(key)
     if not p then
+        flashMsg(L('pv_fail_unset', L('pv_' .. key)))
         log('试播失败：未配置 ' .. tostring(key))
         return
     end
     -- 文件夹（歌单池）也允许试播：播放器侧会随机抽一首
     local looksDir = p:sub(-1) == '\\' or p:sub(-1) == '/'
     if not looksDir and not CFG.fileExists(p) then
+        flashMsg(L('pv_fail', p))
         log('试播失败：找不到 ' .. tostring(p))
         return
     end
@@ -689,6 +843,7 @@ local function previewFile(key)
     writeIpc(content, true)
     previewHoldUntil = os.clock() + 2.0
     lastPreviewPath = p
+    flashMsg(L('pv_ok', p))
     log('已请求试播：' .. p)
 end
 
@@ -698,7 +853,7 @@ local function openMusicFolder()
     writeIpc('state=' .. view.state .. '\nopen=' .. MEDIA .. '\n', true)
     openHoldUntil = os.clock() + 4.0
     if not playerAlive() then launchPlayer() end
-    flashMsg('已请求打开音乐文件夹（资源管理器在游戏后面，切出去即见）')
+    flashMsg(L('open_req'))
 end
 
 if ui then
@@ -711,37 +866,37 @@ if ui then
         showClose = false, widthFrac = 0.24, topFrac = 0.10, bottomFrac = 0.12,
         canOpen = function() return true end,
     })
-    ui.Register({ id = 'custombgm', title = 'CustomBGM 音乐箱', items = {
-        { type = 'label', id = 'status', label = '当前状态：-' },
-        { type = 'label', id = 'hp',     label = '生命：-' },
-        { type = 'label', id = 'src',    label = 'MusicSubsystem：-' },
-        { type = 'label', id = 'player', label = '播放器：-' },
-        { type = 'label', id = 'now',    label = '正在播放：-' },
-        { type = 'label', id = 'files',  label = '音乐文件：-' },
-        { type = 'label', id = 'vols',   label = '音量：-' },
-        { type = 'label', id = 'lowpct', label = '低血阈值：-' },
-        { type = 'label', id = 'bossline', label = 'Boss：-' },
+    ui.Register({ id = 'custombgm', title = L('panel_title'), items = {
+        { type = 'label', id = 'status', label = L('lb_status') .. L('dash') },
+        { type = 'label', id = 'hp',     label = L('hp_dash') },
+        { type = 'label', id = 'src',    label = 'MusicSubsystem: -' },
+        { type = 'label', id = 'player', label = L('player_ok') },
+        { type = 'label', id = 'now',    label = L('lb_now') .. L('dash') },
+        { type = 'label', id = 'files',  label = L('files_fmt', '-', '-', '-', '-') },
+        { type = 'label', id = 'vols',   label = L('vols_dash') },
+        { type = 'label', id = 'lowpct', label = L('lowpct_dash') },
+        { type = 'label', id = 'bossline', label = L('boss_na') },
         { type = 'label', id = 'err',    label = ' ' },
         { type = 'separator' },
-        { type = 'button', id = 'master', label = '总开关：开', onClick = function() sw.master = not sw.master; log('开关: 总开关 = ' .. tostring(sw.master)) end },
-        { type = 'button', id = 'combat', label = '战斗曲：开', onClick = function() sw.combat = not sw.combat; log('开关: 战斗曲 = ' .. tostring(sw.combat)) end },
-        { type = 'button', id = 'low',    label = '低血曲：开', onClick = function() sw.low = not sw.low; log('开关: 低血曲 = ' .. tostring(sw.low)) end },
-        { type = 'button', id = 'death',  label = '死亡曲：开', onClick = function() sw.death = not sw.death; log('开关: 死亡曲 = ' .. tostring(sw.death)) end },
-        { type = 'button', id = 'lowsticky', label = '低血粘滞：开', onClick = function() sw.lowSticky = not sw.lowSticky; log('开关: 低血粘滞(播到战斗结束) = ' .. tostring(sw.lowSticky)) end },
-        { type = 'button', id = 'boss', label = '决战曲：开', onClick = function() sw.boss = not sw.boss; log('开关: 决战曲 = ' .. tostring(sw.boss)) end },
+        { type = 'button', id = 'master', label = L('master_on'), onClick = function() sw.master = not sw.master; log('开关: 总开关 = ' .. tostring(sw.master)) end },
+        { type = 'button', id = 'combat', label = L('combat_on'), onClick = function() sw.combat = not sw.combat; log('开关: 战斗曲 = ' .. tostring(sw.combat)) end },
+        { type = 'button', id = 'low',    label = L('low_on'), onClick = function() sw.low = not sw.low; log('开关: 低血曲 = ' .. tostring(sw.low)) end },
+        { type = 'button', id = 'death',  label = L('death_on'), onClick = function() sw.death = not sw.death; log('开关: 死亡曲 = ' .. tostring(sw.death)) end },
+        { type = 'button', id = 'lowsticky', label = L('sticky_on'), onClick = function() sw.lowSticky = not sw.lowSticky; log('开关: 低血粘滞(播到战斗结束) = ' .. tostring(sw.lowSticky)) end },
+        { type = 'button', id = 'boss', label = L('boss_on'), onClick = function() sw.boss = not sw.boss; log('开关: 决战曲 = ' .. tostring(sw.boss)) end },
         { type = 'separator' },
-        { type = 'button', id = 'pv_combat', label = '试播：战斗曲', onClick = function() previewFile('combat') end },
-        { type = 'button', id = 'pv_low',    label = '试播：低血曲', onClick = function() previewFile('low') end },
-        { type = 'button', id = 'pv_death',  label = '试播：死亡曲', onClick = function() previewFile('death') end },
-        { type = 'button', id = 'pv_boss',   label = '试播：决战曲', onClick = function() previewFile('boss') end },
+        { type = 'button', id = 'pv_combat', label = L('pv', L('pv_combat')), onClick = function() previewFile('combat') end },
+        { type = 'button', id = 'pv_low',    label = L('pv', L('pv_low')), onClick = function() previewFile('low') end },
+        { type = 'button', id = 'pv_death',  label = L('pv', L('pv_death')), onClick = function() previewFile('death') end },
+        { type = 'button', id = 'pv_boss',   label = L('pv', L('pv_boss')), onClick = function() previewFile('boss') end },
         { type = 'separator' },
-        { type = 'button', id = 'vol_down', label = '总音量 −10', onClick = function() adjustVol(-10) end },
-        { type = 'button', id = 'vol_up',   label = '总音量 +10', onClick = function() adjustVol(10) end },
-        { type = 'button', id = 'vol_save', label = '保存音量设置', onClick = function() saveVol() end },
-        { type = 'button', id = 'pct_down', label = '低血阈值 −5', onClick = function() adjustLowPct(-5) end },
-        { type = 'button', id = 'pct_up',   label = '低血阈值 +5', onClick = function() adjustLowPct(5) end },
-        { type = 'button', id = 'pct_save', label = '保存阈值', onClick = function() saveLowPct() end },
-        { type = 'button', id = 'fixinput', label = '修复输入模式', onClick = function()
+        { type = 'button', id = 'vol_down', label = L('vol_down'), onClick = function() adjustVol(-10) end },
+        { type = 'button', id = 'vol_up',   label = L('vol_up'), onClick = function() adjustVol(10) end },
+        { type = 'button', id = 'vol_save', label = L('vol_save'), onClick = function() saveVol() end },
+        { type = 'button', id = 'pct_down', label = L('pct_down'), onClick = function() adjustLowPct(-5) end },
+        { type = 'button', id = 'pct_up',   label = L('pct_up'), onClick = function() adjustLowPct(5) end },
+        { type = 'button', id = 'pct_save', label = L('pct_save'), onClick = function() saveLowPct() end },
+        { type = 'button', id = 'fixinput', label = L('fixinput'), onClick = function()
             -- 手柄/键盘被别的同框架 mod 卡死时的手动逃生口：
             -- 先收自己的壳，再无条件把输入模式拉回游戏层
             pcall(function() ui.Close() end)
@@ -752,10 +907,11 @@ if ui then
             log('已强制恢复输入模式（修复输入模式按钮）')
         end },
         { type = 'separator' },
-        { type = 'button', id = 'stopall', label = '全部停止', onClick = function() writeIpc('state=stop\n') end },
-        { type = 'button', id = 'open_media', label = '打开音乐文件夹', onClick = function() openMusicFolder() end },
-        { type = 'button', id = 'reload_ini', label = '重载音乐配置', onClick = function() pendingReload = true; mediaIniAt = 0 end },
-        { type = 'button', id = 'close', label = '关闭菜单', onClick = function() ui.Close() end },
+        { type = 'button', id = 'stopall', label = L('stopall'), onClick = function() writeIpc('state=stop\n') end },
+        { type = 'button', id = 'open_media', label = L('open_media'), onClick = function() openMusicFolder() end },
+        { type = 'button', id = 'reload_ini', label = L('reload_ini'), onClick = function() pendingReload = true; mediaIniAt = 0 end },
+        { type = 'button', id = 'lang', label = L('btn_lang'), onClick = function() toggleLang() end },
+        { type = 'button', id = 'close', label = L('close'), onClick = function() ui.Close() end },
     } })
     ui.OnOpen(updateMenu)
     RegisterKeyBind(Key.ESCAPE, function()
@@ -813,5 +969,5 @@ end
 -- 主循环
 --------------------------------------------------
 LoopInGameThreadWithDelay(opt.pollMs, tick)
-log('loaded v0.6.5！音乐目录：' .. MEDIA .. '；菜单键：' .. opt.menuKey .. '；轮询：' .. opt.pollMs .. 'ms；低血阈值=' .. opt.lowPct .. '%；决战阈值=' .. opt.bossPct .. '%；死亡延时=' .. tostring(opt.deathHold) .. 's')
+log('loaded v0.6.7！音乐目录：' .. MEDIA .. '；菜单键：' .. opt.menuKey .. '；轮询：' .. opt.pollMs .. 'ms；低血阈值=' .. opt.lowPct .. '%；决战阈值=' .. opt.bossPct .. '%；死亡延时=' .. tostring(opt.deathHold) .. 's；语言=' .. opt.lang)
 log('战斗/低血/死亡触发=哨兵只读；音乐=PBZPlayer.exe（PBZMusic 目录）')
